@@ -6,7 +6,33 @@
     <title>Браузер ПИЗДА</title>
     <style>
         * { box-sizing: border-box; }
-        body { margin: 0; padding: 0; background: radial-gradient(circle at center, #1a1a2e 0%, #0f0c1b 100%); color: #ffffff; font-family: 'Segoe UI', Roboto, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; overflow: hidden; position: relative; }
+        body { 
+            margin: 0; 
+            padding: 0; 
+            background: radial-gradient(circle at center, #1a1a2e 0%, #0f0c1b 100%); 
+            color: #ffffff; 
+            font-family: 'Segoe UI', Roboto, sans-serif; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            overflow: hidden; 
+            position: relative;
+            transition: background 1.5s ease;
+        }
+        body.matrix-active {
+            background: #000000;
+        }
+        #matrixCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            display: none;
+        }
         .search-container { text-align: center; width: 100%; max-width: 700px; padding: 20px; position: relative; z-index: 10; }
         .logo { font-size: 4rem; font-weight: 900; letter-spacing: 5px; margin-bottom: 30px; text-transform: uppercase; background: linear-gradient(45deg, #ff007f, #7f00ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 15px rgba(255, 0, 127, 0.5)); }
         .search-box { position: relative; display: flex; align-items: center; width: 100%; }
@@ -17,6 +43,21 @@
         .result-screen { display: none; font-size: 3.5rem; font-weight: 900; line-height: 1.2; word-wrap: break-word; }
         .lox-text { font-size: 5rem; color: #ff3333; text-shadow: 0 0 20px #ff3333, 0 0 40px #ff0000; letter-spacing: 10px; }
         .dima-text { font-size: 3rem; color: #ff3399; text-shadow: 0 0 15px #ff3399; }
+        .end-text { 
+            font-size: 4rem; 
+            font-weight: 900; 
+            color: #00ffcc; 
+            text-shadow: 0 0 20px #00ffcc, 0 0 50px #00ff88; 
+            animation: glitch 1s linear infinite;
+        }
+        @keyframes glitch {
+            0% { transform: skew(0deg); }
+            20% { transform: skew(-3deg); filter: hue-rotate(90deg); }
+            40% { transform: skew(3deg); }
+            60% { transform: skew(-1deg); filter: hue-rotate(180deg); }
+            80% { transform: skew(2deg); }
+            100% { transform: skew(0deg); }
+        }
         .normal-text { font-size: 2rem; color: #00ffff; text-shadow: 0 0 15px #00ffff; }
         .loader { display: none; width: 50px; height: 50px; border: 5px solid rgba(255, 255, 255, 0.1); border-radius: 50%; border-top-color: #7f00ff; animation: spin 1s linear infinite; margin: 20px auto; }
         @keyframes spin { to { transform: rotate(360deg); } }
@@ -25,6 +66,7 @@
     </style>
 </head>
 <body>
+    <canvas id="matrixCanvas"></canvas>
     <div class="search-container">
         <div class="logo" id="logo">Пизда</div>
         <form id="searchForm" onsubmit="processSearch(event)">
@@ -44,6 +86,9 @@
         const loader = document.getElementById('loader');
         const resultScreen = document.getElementById('resultScreen');
         const backBtn = document.getElementById('backBtn');
+        const canvas = document.getElementById('matrixCanvas');
+        const ctx = canvas.getContext('2d');
+        let matrixInterval = null;
 
         function processSearch(event) {
             if (event) event.preventDefault();
@@ -61,7 +106,11 @@
                 resultScreen.style.display = 'block';
                 backBtn.style.display = 'inline-block';
 
-                if (query.includes('дима лох')) {
+                if (query.includes('конец пизды')) {
+                    document.body.classList.add('matrix-active');
+                    resultScreen.innerHTML = '<span class="end-text">СИСТЕМА СЛОМАНА<br>КОНЕЦ ПИЗДЫ</span>';
+                    startMatrix();
+                } else if (query.includes('дима лох')) {
                     resultScreen.innerHTML = '<span class="dima-text">Ты сын ебанной жирной бляди❤️</span>';
                 } else if (query.includes('пизда')) {
                     resultScreen.innerHTML = '<span class="lox-text">ЛОХ</span>';
@@ -72,12 +121,57 @@
         }
 
         backBtn.addEventListener('click', function() {
+            document.body.classList.remove('matrix-active');
             searchForm.style.display = 'block';
             logo.style.display = 'block';
             resultScreen.style.display = 'none';
             backBtn.style.display = 'none';
             searchInput.value = '';
+            stopMatrix();
             setTimeout(() => searchInput.focus(), 50);
+        });
+
+        function startMatrix() {
+            canvas.style.display = 'block';
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            const katakana = 'ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ1023456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            const alphabet = katakana.split('');
+            const fontSize = 16;
+            const columns = canvas.width / fontSize;
+            const rainDrops = Array(Math.floor(columns)).fill(1);
+
+            matrixInterval = setInterval(() => {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                ctx.fillStyle = '#0F0';
+                ctx.font = fontSize + 'px monospace';
+
+                for (let i = 0; i < rainDrops.length; i++) {
+                    const text = alphabet[Math.floor(Math.random() * alphabet.length)];
+                    ctx.fillText(text, i * fontSize, rainDrops[i] * fontSize);
+                    
+                    if (rainDrops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                        rainDrops[i] = 0;
+                    }
+                    rainDrops[i]++;
+                }
+            }, 30);
+        }
+
+        function stopMatrix() {
+            clearInterval(matrixInterval);
+            canvas.style.display = 'none';
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        window.addEventListener('resize', () => {
+            if (canvas.style.display === 'block') {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
         });
     </script>
 </body>
