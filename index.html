@@ -44,18 +44,25 @@
         .lox-text { font-size: 5rem; color: #ff3333; text-shadow: 0 0 20px #ff3333, 0 0 40px #ff0000; letter-spacing: 10px; }
         .dima-text { font-size: 3rem; color: #ff3399; text-shadow: 0 0 15px #ff3399; }
         .end-text { 
-            font-size: 4rem; 
+            font-size: 3rem; 
             font-weight: 900; 
-            color: #00ffcc; 
-            text-shadow: 0 0 20px #00ffcc, 0 0 50px #00ff88; 
-            animation: glitch 1s linear infinite;
+            background: linear-gradient(90deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #8b00ff);
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: rainbow 4s linear infinite, glitch 1s linear infinite;
+        }
+        @keyframes rainbow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
         @keyframes glitch {
             0% { transform: skew(0deg); }
-            20% { transform: skew(-3deg); filter: hue-rotate(90deg); }
-            40% { transform: skew(3deg); }
-            60% { transform: skew(-1deg); filter: hue-rotate(180deg); }
-            80% { transform: skew(2deg); }
+            20% { transform: skew(-2deg); filter: hue-rotate(45deg); }
+            40% { transform: skew(2deg); }
+            60% { transform: skew(-1deg); filter: hue-rotate(90deg); }
+            80% { transform: skew(1deg); }
             100% { transform: skew(0deg); }
         }
         .normal-text { font-size: 2rem; color: #00ffff; text-shadow: 0 0 15px #00ffff; }
@@ -108,7 +115,7 @@
 
                 if (query.includes('конец пизды')) {
                     document.body.classList.add('matrix-active');
-                    resultScreen.innerHTML = '<span class="end-text">СИСТЕМА СЛОМАНА<br>КОНЕЦ ПИЗДЫ</span>';
+                    resultScreen.innerHTML = '<span class="end-text">МОЛОДЕЦ ТЫ ПРОШЕЛ ПИЗДУ ПОЛНОСТЬЮ</span>';
                     startMatrix();
                 } else if (query.includes('дима лох')) {
                     resultScreen.innerHTML = '<span class="dima-text">Ты сын ебанной жирной бляди❤️</span>';
